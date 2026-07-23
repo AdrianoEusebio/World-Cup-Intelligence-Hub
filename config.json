@@ -1,0 +1,10 @@
+{
+  "URL_RANKING_FIFA": "https://en.wikipedia.org/wiki/FIFA_World_Rankings",
+  "ARQUIVO_PARTIDAS_MOCK": "data/partidas_simuladas.json",
+  "CAMINHO_EXPORT_CSV": "data/ranking_fifa_top10.csv",
+  "CAMINHO_EXPORT_INSIGHTS": "data/insights_copa_do_mundo.txt",
+  "TEMPO_DE_ESPERA": 30000,
+  "SCRAPER_INDICE_RANQUEAMENTO": 0,
+  "SCRAPER_INDICE_SELECAO": 2,
+  "SCRAPER_INDICE_PONTOS": 3
+}

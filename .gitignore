@@ -1,0 +1,21 @@
+# Variáveis de Ambiente e Credenciais Sensíveis
+.env
+
+# Python Cache e Arquivos Compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes Virtuais
+venv/
+.venv/
+env/
+ENV/
+
+# Logs da Aplicação
+*.log
+data/*.log
+
+# Configurações de IDEs (VS Code / PyCharm)
+.vscode/
+.idea/

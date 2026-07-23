@@ -1,0 +1,128 @@
+{
+  "matches": [
+    {
+      "id": 1,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Brazil" },
+      "awayTeam": { "name": "Croatia" },
+      "score": {
+        "fullTime": { "home": 3, "away": 1 }
+      }
+    },
+    {
+      "id": 2,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Cameroon" },
+      "awayTeam": { "name": "Brazil" },
+      "score": {
+        "fullTime": { "home": 1, "away": 4 }
+      }
+    },
+    {
+      "id": 3,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Brazil" },
+      "awayTeam": { "name": "Chile" },
+      "score": {
+        "fullTime": { "home": 2, "away": 0 }
+      }
+    },
+    {
+      "id": 4,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Brazil" },
+      "awayTeam": { "name": "Colombia" },
+      "score": {
+        "fullTime": { "home": 2, "away": 1 }
+      }
+    },
+    {
+      "id": 5,
+      "status": "FINISHED",
+      "homeTeam": { "name": "France" },
+      "awayTeam": { "name": "Honduras" },
+      "score": {
+        "fullTime": { "home": 3, "away": 0 }
+      }
+    },
+    {
+      "id": 6,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Switzerland" },
+      "awayTeam": { "name": "France" },
+      "score": {
+        "fullTime": { "home": 2, "away": 5 }
+      }
+    },
+    {
+      "id": 7,
+      "status": "FINISHED",
+      "homeTeam": { "name": "France" },
+      "awayTeam": { "name": "Nigeria" },
+      "score": {
+        "fullTime": { "home": 2, "away": 0 }
+      }
+    },
+    {
+      "id": 8,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Argentina" },
+      "awayTeam": { "name": "Bosnia" },
+      "score": {
+        "fullTime": { "home": 2, "away": 1 }
+      }
+    },
+    {
+      "id": 9,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Argentina" },
+      "awayTeam": { "name": "Iran" },
+      "score": {
+        "fullTime": { "home": 1, "away": 0 }
+      }
+    },
+    {
+      "id": 10,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Germany" },
+      "awayTeam": { "name": "Portugal" },
+      "score": {
+        "fullTime": { "home": 4, "away": 0 }
+      }
+    },
+    {
+      "id": 11,
+      "status": "FINISHED",
+      "homeTeam": { "name": "USA" },
+      "awayTeam": { "name": "Germany" },
+      "score": {
+        "fullTime": { "home": 0, "away": 1 }
+      }
+    },
+    {
+      "id": 12,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Belgium" },
+      "awayTeam": { "name": "Algeria" },
+      "score": {
+        "fullTime": { "home": 2, "away": 1 }
+      }
+    },
+    {
+      "id": 100,
+      "status": "CANCELLED",
+      "homeTeam": { "name": "Italy" },
+      "awayTeam": { "name": "England" },
+      "score": {
+        "fullTime": { "home": null, "away": null }
+      }
+    },
+    {
+      "id": 101,
+      "status": "FINISHED",
+      "homeTeam": { "name": "Spain" },
+      "awayTeam": { "name": "Netherlands" },
+      "score": null
+    }
+  ]
+}

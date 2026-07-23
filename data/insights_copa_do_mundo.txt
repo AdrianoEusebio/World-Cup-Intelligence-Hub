@@ -1,0 +1,9 @@
+=== World Cup Intelligence Hub - Análise de IA (Simulada) ===
+
+Com base nas estatísticas consolidadas das partidas recentes e nos dados do ranking mundial, as três seleções com maior probabilidade de sucesso no próximo torneio são:
+
+1. Argentina: Mantém uma pontuação altíssima no ranking e demonstra consistência ofensiva.
+2. France: Equipe taticamente disciplinada, com alta média de gols por partida.
+3. Brazil: Maior volume de vitórias nos confrontos simulados, despontando como forte candidata.
+
+Previsão: A disputa final tende a concentrar-se entre Argentina e França, com o Brasil correndo por fora com alto poder de fogo.
