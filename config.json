@@ -1,13 +1,13 @@
 {
-  "URL_RANKING_FIFA": "https://en.wikipedia.org/wiki/FIFA_World_Rankings",
+  "URL_RANKING_FIFA": "https://inside.fifa.com/en/fifa-rankings?intcmp=%28p_fifacom%29_%28d_insidefifa%29_%28c_webheader-main%29_%28sc_rankings%29_%28ssc_%29_%28sssc_%29_%28l_en%29_%28da_27112023%29",
   "ARQUIVO_PARTIDAS_MOCK": "data/partidas_simuladas.json",
   "URL_API_PARTIDAS": "https://api.football-data.org/v4/competitions/WC/matches",
   "CAMINHO_EXPORT_CSV": "data/ranking_fifa_top10.csv",
   "CAMINHO_EXPORT_INSIGHTS": "data/insights_copa_do_mundo.txt",
   "TEMPO_DE_ESPERA": 30000,
   "SCRAPER_INDICE_RANQUEAMENTO": 0,
-  "SCRAPER_INDICE_SELECAO": 2,
-  "SCRAPER_INDICE_PONTOS": 3,
+  "SCRAPER_INDICE_SELECAO": 1,
+  "SCRAPER_INDICE_PONTOS": 2,
   "LLM_SYSTEM_PROMPT": "Você é um analista especialista em dados esportivos da Copa do Mundo.",
   "LLM_PROMPT_TEMPLATE": "Você recebeu os dados analíticos consolidados das 3 melhores seleções da Copa do Mundo:\n\n{dados_texto}\n\nCom base nestas estatísticas (vitórias em partidas históricas recentes e pontuação atual do ranking da FIFA), gere uma análise esportiva detalhada e profissional (cerca de 2 a 3 parágrafos) justificando as posições e fazendo uma previsão sobre qual delas tem as melhores chances de se sagrar campeã mundial."
 }
