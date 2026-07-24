@@ -14,21 +14,17 @@ class PlaywrightRankingScraper(RankingScraper):
         ranking_entries = []
 
         with sync_playwright() as p:
-            # Lança o navegador Chromium em modo headless (sem interface visual)
             browser = p.chromium.launch(headless=True)
-            
-            # Cria um contexto de navegador com User-Agent para evitar detecção básica de robôs
+
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
             )
             page = context.new_page()
 
             try:
-                # Navega até a URL com o tempo limite configurado no config.json
                 page.goto(url, timeout=settings.TEMPO_DE_ESPERA)
                 
                 # Aguarda o elemento da tabela carregar na tela
-                # Usamos um seletor genérico 'table' pois a FIFA usa tabelas estruturadas
                 page.wait_for_selector("table", timeout=15000)
 
                 # Busca as linhas da tabela (tbody tr)
@@ -43,7 +39,6 @@ class PlaywrightRankingScraper(RankingScraper):
                     if count >= 10:
                         break
 
-                    # Captura todas as células (td) da linha atual
                     cells = row.query_selector_all("td")
                     
                     max_indice_necessario = max(
@@ -55,26 +50,21 @@ class PlaywrightRankingScraper(RankingScraper):
                     if len(cells) <= max_indice_necessario:
                         continue
 
-                    # Extrai o texto de cada célula preservando as colunas
                     textos_limpos = [c.inner_text().strip() for c in cells]
 
                     if len(textos_limpos) > max_indice_necessario:
                         try:
-                            # 1. Ranqueamento (Posição)
                             raw_ranqueamento = textos_limpos[settings.SCRAPER_INDICE_RANQUEAMENTO]
                             pos_str = "".join(filter(str.isdigit, raw_ranqueamento))
                             ranqueamento = int(pos_str) if pos_str else (count + 1)
 
-                            # 2. Nome da Seleção (Limpa quebras de linha)
                             raw_selecao = textos_limpos[settings.SCRAPER_INDICE_SELECAO]
                             nome_selecao = raw_selecao.split("\n")[0].strip()
 
-                            # 3. Pontos (Remove formatações de milhar e converte para float)
                             raw_pontos = textos_limpos[settings.SCRAPER_INDICE_PONTOS]
                             pontos_str = raw_pontos.replace(",", "").strip()
                             pontos = float(pontos_str)
 
-                            # Cria a entidade
                             entry = RankingEntry(
                                 ranqueamento=ranqueamento,
                                 nome_selecao=nome_selecao,
@@ -82,25 +72,24 @@ class PlaywrightRankingScraper(RankingScraper):
                             )
                             ranking_entries.append(entry)
                             count += 1
+
                         except Exception as parse_err:
                             logger.warning(f"Erro ao processar linha {count + 1}: {parse_err}. Dados: {textos_limpos}")
                             continue
 
             except Exception as e:
-                # Cenário do TDD: Fallback silencioso se a raspagem real falhar (Ex: Site fora do ar ou bloqueio)
                 logger.warning(f"Falha ao raspar ranking FIFA (Erro: {e}). Acionando fallback mockado.")
                 ranking_entries = self._obter_ranking_mock()
 
             finally:
                 browser.close()
 
-        # Exporta os resultados extraídos para o arquivo CSV conforme solicitado
         self._exportar_para_csv(ranking_entries)
         
         return ranking_entries
 
     def _exportar_para_csv(self, entries: list[RankingEntry]):
-        """Exporta a lista de ranking para um arquivo CSV local."""
+
         csv_path = Path(__file__).resolve().parent.parent.parent / settings.CAMINHO_EXPORT_CSV
         csv_path.parent.mkdir(exist_ok=True)
 
@@ -110,14 +99,16 @@ class PlaywrightRankingScraper(RankingScraper):
             with open(csv_path, mode="w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(["Ranqueamento", "Seleção", "Pontuação"])
+
                 for e in entries:
                     writer.writerow([e.ranqueamento, e.nome_selecao, e.pontos])
+
             logger.info("CSV de ranking exportado com sucesso!")
         except Exception as e:
             logger.error(f"Falha ao exportar CSV: {e}")
 
     def _obter_ranking_mock(self) -> list[RankingEntry]:
-        """Dados mockados de contingência (TDD CT-07)."""
+        """Dados mockados de contingência"""
         return [
             RankingEntry(ranqueamento=1, nome_selecao="Argentina", pontos=1860.14),
             RankingEntry(ranqueamento=2, nome_selecao="France", pontos=1840.76),

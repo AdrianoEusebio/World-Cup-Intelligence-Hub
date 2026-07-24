@@ -2,7 +2,7 @@ import pandas as pd
 from adapters.api.interfaces import MatchRepository
 from core.entities.stats import SelectionStats
 from config.logging_config import logger
-from core.enum import StatusPartida, ResultadoPartida
+from core.enum import StatusPartida
 
 class ProcessMatchesUseCase:
     """Caso de uso responsável por limpar e processar estatísticas das partidas usando Pandas."""
@@ -19,9 +19,6 @@ class ProcessMatchesUseCase:
             dados_partidas.append(dicionario)
 
         df = pd.DataFrame(dados_partidas)
-        # ==========================================
-        # SEU DESAFIO PARTE A: LIMPEZA DE DADOS
-        # ==========================================
         status_finalizada = StatusPartida.FINALIZADA.value
         df = df[(df['status'] == status_finalizada) & 
                 (df['placar_time_da_casa'].notna()) & 
@@ -29,15 +26,9 @@ class ProcessMatchesUseCase:
         
         df_limpo = df
 
-        # ==========================================
-        # SEU DESAFIO PARTE B: CÁLCULO DA MÉDIA DE GOLS
-        # ==========================================
         df_limpo['gols_total'] = df_limpo['placar_time_da_casa'] + df_limpo['placar_time_visitante']
         media_gols = df_limpo['gols_total'].mean()
 
-        # ==========================================
-        # SEU DESAFIO PARTE C: TOP 5 SELEÇÕES (VITÓRIAS)
-        # ==========================================
         top_5_series = df_limpo['time_vencedor'].value_counts().head(5)
         
         selecoes_consolidadas = []

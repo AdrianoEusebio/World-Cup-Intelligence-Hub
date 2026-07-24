@@ -1,5 +1,5 @@
 import uuid
-from adapters.api.local_json import LocalJsonMatchRepository
+from adapters.api.football_api import HttpMatchRepository
 from adapters.scraper.playwright_impl import PlaywrightRankingScraper
 from adapters.database.postgres_impl import PostgreSqlSelectionRepository, PostgreSqlPipelineLogRepository
 from adapters.llm.openai_client import OpenAICompatibleLLMClient
@@ -12,11 +12,14 @@ from config.logging_config import logger
 
 def main():
     id_execucao = str(uuid.uuid4())
-    logger.info(f"Iniciando Pipeline de Inteligência da Copa do Mundo (ID: {id_execucao})...")
+    logger.info("=" * 75)
+    logger.info(f"INICIANDO PIPELINE DE INTEGRACAO")
+    logger.info(f"EXECUTION ID: {id_execucao}")
+    logger.info("=" * 75)
     
     try:
         # 1. Setup dos Repositórios (Adaptadores)
-        match_repo = LocalJsonMatchRepository()
+        match_repo = HttpMatchRepository()
         db_stats_repo = PostgreSqlSelectionRepository()
         db_log_repo = PostgreSqlPipelineLogRepository(db_stats_repo)
         scraper = PlaywrightRankingScraper()
@@ -29,7 +32,9 @@ def main():
         generate_insight_uc = GenerateLLMInsightUseCase(db_stats_repo, llm_client)
         
         # --- PASSO A: Ingestão de Partidas ---
-        logger.info("[PASSO A] Iniciando processamento analítico das partidas...")
+        logger.info("\n" + "-" * 75)
+        logger.info("[PASSO 1] Ingestão de Partidas Real-Time & Limpeza (Pandas)")
+        logger.info("-" * 75)
         top_vitorias, media_gols = process_matches_uc.execute()
         db_log_repo.write_log(PipelineLog(
             id_execucao=id_execucao, 
@@ -39,7 +44,9 @@ def main():
         ))
         
         # --- PASSO B: Automação Web (Scraping) ---
-        logger.info("[PASSO B] Iniciando raspagem do ranking FIFA ao vivo...")
+        logger.info("\n" + "-" * 75)
+        logger.info("[PASSO 2] Automação de Raspagem de Rankings FIFA (Playwright)")
+        logger.info("-" * 75)
         ranking_real = scrape_ranking_uc.execute()
         db_log_repo.write_log(PipelineLog(
             id_execucao=id_execucao, 
@@ -49,7 +56,9 @@ def main():
         ))
         
         # --- PASSO C: Merge & Persistência ---
-        logger.info("[PASSO C] Executando merge analítico e persistência no PostgreSQL...")
+        logger.info("\n" + "-" * 75)
+        logger.info("[PASSO 3] Cruzamento de Fontes (Outer Join) & Persistência Idempotente")
+        logger.info("-" * 75)
         dados_consolidados = merge_uc.execute(top_vitorias, ranking_real)
         db_log_repo.write_log(PipelineLog(
             id_execucao=id_execucao, 
@@ -59,7 +68,9 @@ def main():
         ))
 
         # --- PASSO D: Geração de Insights com LLM ---
-        logger.info("[PASSO D] Iniciando geração de insights com IA...")
+        logger.info("\n" + "-" * 75)
+        logger.info("[PASSO 4] Análise Esportiva de Alta Confiabilidade (IA / LLM)")
+        logger.info("-" * 75)
         insight = generate_insight_uc.execute()
         db_log_repo.write_log(PipelineLog(
             id_execucao=id_execucao, 
@@ -69,14 +80,18 @@ def main():
         ))
         
         # --- EXIBIÇÃO DE RESULTADOS ---
-        logger.info("=== PIPELINE EXECUTADO COM SUCESSO ===")
-        logger.info(f"Média de gols do campeonato: {media_gols:.2f}")
-        logger.info("=== LEITURA DE DADOS UNIFICADOS SALVOS NO BANCO ===")
+        logger.info("\n" + "=" * 75)
+        logger.info("=== PIPELINE FINALIZADO COM SUCESSO ===")
+        logger.info(f"Média de gols de todas as partidas: {media_gols:.2f}")
+        logger.info("TABELA CONSOLIDADA SALVA NO BANCO (PostgreSQL)")
+        logger.info("-" * 75)
         for s in dados_consolidados:
-            logger.info(f"Seleção: {s.nome_selecao} | Vitórias: {s.vitorias} | Pontos Ranking: {s.pontos}")
+            logger.info(f"Seleção: {s.nome_selecao:<15} | Vitórias: {s.vitorias:<3} | Pontos Ranking: {str(s.pontos):<8}")
+        logger.info("-" * 75)
         
-        logger.info("\n=== INSIGHT GERADO PELA IA ===")
+        logger.info("\n=== INSIGHT ANALÍTICO DA IA ===")
         logger.info(f"\n{insight}")
+        logger.info("=" * 75 + "\n")
             
     except Exception as e:
         logger.error(f"FALHA CRÍTICA NO PIPELINE: {e}", exc_info=True)

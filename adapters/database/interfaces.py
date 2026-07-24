@@ -3,11 +3,11 @@ from core.entities.stats import SelectionStats
 from core.entities.log import PipelineLog
 
 class SelectionStatsRepository(ABC):
-    """Interface abstrata (contrato) para salvar estatísticas consolidadas."""
+    """Interface abstrata para salvar estatísticas consolidadas."""
 
     @abstractmethod
     def save(self, stats: SelectionStats) -> None:
-        """Salva ou atualiza (upsert) as estatísticas de uma seleção."""
+        """Salva ou atualiza as estatísticas de uma seleção."""
         pass
 
     @abstractmethod
@@ -17,7 +17,7 @@ class SelectionStatsRepository(ABC):
 
 
 class PipelineLogRepository(ABC):
-    """Interface abstrata (contrato) para persistência de logs de execução do pipeline."""
+    """Interface abstrata para persistência de logs de execução do pipeline."""
 
     @abstractmethod
     def write_log(self, log_entry: PipelineLog) -> None:

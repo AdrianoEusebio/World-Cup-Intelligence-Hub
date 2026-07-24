@@ -21,18 +21,12 @@ class MergeAndPersistUseCase:
         if not df_rank.empty:
             df_rank = df_rank.drop(columns=['ranqueamento'], errors='ignore')
 
-        # ==========================================
-        # SEU DESAFIO PARTE A: O MERGE (CRUZAMENTO)
-        # ==========================================
         df_consolidado = pd.merge(df_vits, df_rank, on='nome_selecao', how='outer')
         lista_retorno = []
         if not df_consolidado.empty:
             df_consolidado['vitorias'] = df_consolidado['vitorias'].fillna(0).astype(int)
             df_consolidado = df_consolidado.where(pd.notnull(df_consolidado), None)
 
-        # ==========================================
-        # SEU DESAFIO PARTE B: SALVAR NO BANCO
-        # ==========================================
         for index, linha in df_consolidado.iterrows():
             try:
                 pontos_raw = linha['pontos']
@@ -45,6 +39,7 @@ class MergeAndPersistUseCase:
                 )
                 self.stats_repo.save(stats)
                 lista_retorno.append(stats)
+                
             except Exception as e:
                 logger.error(f"Erro ao salvar dados da seleção {linha['nome_selecao']}: {e}")
 

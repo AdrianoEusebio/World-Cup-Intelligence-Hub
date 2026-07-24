@@ -4,7 +4,7 @@ from config.settings import settings
 from config.logging_config import logger
 
 class OpenAICompatibleLLMClient(LLMClient):
-    """Adaptador de LLM que suporta qualquer provedor compatível com o padrão OpenAI (OpenAI, DeepSeek, Ollama, etc.)."""
+    """Adaptador de LLM que suporta qualquer provedor compatível com o padrão OpenAI"""
 
     def __init__(self):
         self.api_key = settings.LLM_API_KEY
@@ -12,14 +12,13 @@ class OpenAICompatibleLLMClient(LLMClient):
         self.model = settings.LLM_MODEL
 
     def generate_insight(self, prompt: str) -> str:
-        # TDD CT-08: Se a chave estiver vazia, ativa o fallback com mock silencioso
         if not self.api_key or not self.api_key.strip():
             logger.warning("LLM_API_KEY não configurada no .env. Ativando MockLLMClient silenciosamente.")
             return self._obter_insight_mock()
 
         logger.info(f"Enviando dados para a LLM ({self.model}) via API...")
+
         try:
-            # Inicializa o cliente oficial da OpenAI parametrizado
             client = OpenAI(
                 api_key=self.api_key,
                 base_url=self.base_url
@@ -28,7 +27,7 @@ class OpenAICompatibleLLMClient(LLMClient):
             response = client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "Você é um analista especialista em dados esportivos da Copa do Mundo."},
+                    {"role": "system", "content": settings.LLM_SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7
@@ -42,7 +41,7 @@ class OpenAICompatibleLLMClient(LLMClient):
             return self._obter_insight_mock()
 
     def _obter_insight_mock(self) -> str:
-        """Retorna uma análise simulada realista de fallback."""
+        """Retorna uma análise simulada de fallback."""
         return (
             "=== World Cup Intelligence Hub - Análise de IA (Simulada) ===\n\n"
             "Com base nas estatísticas consolidadas das partidas recentes e nos dados do ranking mundial, "

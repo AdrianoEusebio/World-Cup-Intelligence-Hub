@@ -15,13 +15,11 @@ class GenerateLLMInsightUseCase:
     def execute(self) -> str:
         logger.info("Executando caso de uso de geração de insights com LLM...")
 
-        # 1. Busca as 3 melhores seleções no banco de dados
         top_3 = self.stats_repo.get_top_3()
         if not top_3:
             logger.warning("Nenhum dado de seleção encontrado no banco. Não há dados para enviar à LLM.")
             return ""
 
-        # 2. Constrói o Prompt explicativo contendo os dados brutos
         linhas_dados = []
         for i, s in enumerate(top_3, 1):
             pontos_str = f"{s.pontos:.2f}" if s.pontos is not None else "Sem ranking"
@@ -29,26 +27,17 @@ class GenerateLLMInsightUseCase:
 
         dados_texto = "\n".join(linhas_dados)
         
-        prompt = f"""
-        Você recebeu os dados analíticos consolidados das 3 melhores seleções da Copa do Mundo:
-        
-        {dados_texto}
-        
-        Com base nestas estatísticas (vitórias em partidas históricas recentes e pontuação atual do ranking da FIFA), 
-        gere uma análise esportiva detalhada e profissional (cerca de 2 a 3 parágrafos) justificando as posições e 
-        fazendo uma previsão sobre qual delas tem as melhores chances de se sagrar campeã mundial.
-        """
+        prompt = settings.LLM_PROMPT_TEMPLATE.format(dados_texto=dados_texto)
 
-        # 3. Envia o prompt para o cliente de LLM (com fallback automático se necessário)
         insight = self.llm_client.generate_insight(prompt)
 
-        # 4. Salva o insight no arquivo de texto configurado
         caminho_arquivo = self.base_dir / settings.CAMINHO_EXPORT_INSIGHTS
         caminho_arquivo.parent.mkdir(exist_ok=True)
         
         try:
             with open(caminho_arquivo, "w", encoding="utf-8") as f:
                 f.write(insight)
+                
             logger.info(f"Insight de IA exportado com sucesso em: {caminho_arquivo}")
         except Exception as e:
             logger.error(f"Erro ao salvar arquivo de insights: {e}")
