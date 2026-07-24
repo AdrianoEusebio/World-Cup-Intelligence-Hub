@@ -83,6 +83,17 @@ Abra o terminal (ou Prompt de Comando/PowerShell no Windows) na pasta raiz do pr
 > [!IMPORTANT]
 > Após o setup, abra o arquivo `.env` gerado e configure suas chaves de API (`FOOTBALL_API_KEY`, `LLM_API_KEY`, etc.), conforme necessário.
 
+> [!TIP]
+> **No Linux (Ubuntu/Debian):** Caso o Playwright acuse falta de dependências do sistema (como `libnss3`, `libasound2`, etc.) para rodar o navegador Chromium, execute o comando de instalação do Playwright com privilégios de administrador:
+> * **Com venv padrão:**
+>   ```bash
+>   sudo venv/bin/playwright install-deps
+>   ```
+> * **Com uv:**
+>   ```bash
+>   sudo uv run playwright install-deps
+>   ```
+
 ---
 
 ### Passo 2: Executar o Sistema
