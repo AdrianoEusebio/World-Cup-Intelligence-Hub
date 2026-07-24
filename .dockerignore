@@ -1,0 +1,17 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+data/app.log
+data/*.csv
+data/*.txt
+.env
+Dockerfile
+docker-compose.yml
+Makefile
+run.py
+README.md
+docs/
+tests/

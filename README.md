@@ -23,7 +23,6 @@ O projeto foi inteiramente desenhado seguindo os princípios de **Clean Architec
 A estrutura de diretórios separa rigidamente a lógica de negócio (Core) dos detalhes de infraestrutura (Adapters):
 
 ```text
-fpf_tech/
 ├── config/              # Configurações dinâmicas e leitura do .env
 ├── core/
 │   ├── entities/        # Entidades puras de domínio (Match, SelectionStats, etc.)
@@ -48,74 +47,138 @@ fpf_tech/
 
 ---
 
-## 🚀 Como Rodar o Sistema
+## 🚀 Como Rodar o Sistema (Windows e Linux)
+
+O projeto possui um script centralizador `run.py` escrito em Python, garantindo compatibilidade e facilidade de execução tanto no **Windows** quanto no **Linux** (substituindo a necessidade de utilitários como `make`).
 
 ### Pré-requisitos
-*   **Docker Desktop** instalado e rodando.
-*   **Python 3.10+** (caso queira rodar localmente fora do contêiner).
-
-### Configuração do Arquivo `.env`
-1.  Duplique o arquivo `.env.example` e renomeie-o para `.env`:
-    ```bash
-    cp .env.example .env
-    ```
-2.  Abra o arquivo `.env` e configure suas credenciais:
-    *   `FOOTBALL_API_KEY`: Insira seu token de API do Football-Data.org.
-    *   `LLM_API_KEY`: Insira sua chave do provedor de IA de preferência (Gemini, Groq, OpenAI).
-    *   `LLM_API_BASE_URL` e `LLM_MODEL`: Ajuste conforme a IA que for testar (exemplo do Groq já configurado por padrão).
+*   **Python 3.10+** instalado.
+*   **Docker Desktop** (opcional, necessário apenas se quiser rodar com banco de dados em contêiner).
 
 ---
 
-### Opção A: Execução Completa via Docker (Recomendado)
+### Passo 1: Configuração Inicial do Ambiente
 
-O Docker Compose sobe automaticamente o banco de dados PostgreSQL, aguarda ele estar 100% pronto (healthcheck) e depois executa a nossa aplicação Python.
+Abra o terminal (ou Prompt de Comando/PowerShell no Windows) na pasta raiz do projeto:
 
-1.  **Construir e rodar os contêineres:**
+*   **Com Makefile (Linux / WSL / Windows com Make):**
     ```bash
-    docker-compose up --build
+    make setup
     ```
-2.  **Parar e remover os contêineres:**
+*   **Sem Makefile / Manual (Windows / Linux):**
     ```bash
-    docker-compose down
+    python run.py setup
     ```
+
+**O que este comando faz automaticamente:**
+1. Cria uma cópia do arquivo `.env.example` como `.env` (caso ele ainda não exista).
+2. Cria o ambiente virtual Python (`venv`) — usando `uv` se estiver instalado para setup instantâneo.
+3. Instala todas as dependências do `requirements.txt` dentro do `venv`.
+4. Instala os binários do navegador Chromium para a execução do Playwright.
+
+> [!IMPORTANT]
+> Após o setup, abra o arquivo `.env` gerado e configure suas chaves de API (`FOOTBALL_API_KEY`, `LLM_API_KEY`, etc.), conforme necessário.
 
 ---
 
-### Opção B: Execução Local (Desenvolvimento/Testes)
+### Passo 2: Executar o Sistema
 
-1.  **Criar e ativar o ambiente virtual (venv):**
+Você pode optar por rodar a aplicação em contêineres Docker de ponta a ponta ou executar o pipeline localmente conectado a um banco de dados Dockerizado.
+
+#### Opção A: Execução Local com Banco Dockerizado (Recomendado)
+Esse modo sobe automaticamente o container do PostgreSQL em background e roda o pipeline Python no seu ambiente local (venv), permitindo ver logs rápidos e realizar depurações com facilidade:
+
+*   **Com Makefile (Linux / WSL):**
     ```bash
-    python -m venv venv
-    # No Windows:
-    venv\Scripts\activate
-    # No Linux/macOS:
-    source venv/bin/activate
+    make run-local
     ```
-2.  **Instalar dependências e navegadores do Playwright:**
+*   **Sem Makefile / Manual (Windows / Linux):**
     ```bash
-    pip install -r requirements.txt
-    playwright install chromium
+    python run.py run-local
     ```
-3.  **Subir apenas o Banco de Dados via Docker:**
-    ```bash
-    docker-compose up -d db
-    ```
-4.  **Executar o Pipeline:**
-    ```bash
-    python main.py
-    ```
+
+#### Opção B: Execução Completa via Docker Compose
+Para rodar toda a aplicação e o banco isolados dentro de contêineres Docker:
+
+*   **Com Makefile (Linux / WSL):**
+    - Para iniciar:
+      ```bash
+      make compose-up
+      ```
+    - Para parar:
+      ```bash
+      make compose-down
+      ```
+*   **Sem Makefile / Manual (Windows / Linux):**
+    - Para iniciar:
+      ```bash
+      python run.py compose-up
+      ```
+    - Para parar:
+      ```bash
+      python run.py compose-down
+      ```
 
 ---
 
 ## 🧪 Como Rodar os Testes Automatizados
 
-Com o seu ambiente virtual ativado, você pode rodar todos os testes unitários e de fallback usando o comando:
+Para rodar a suíte completa de testes de forma multiplataforma:
 
-```bash
-make test
-```
+*   **Com Makefile (Linux / WSL):**
+    ```bash
+    make test
+    ```
+*   **Sem Makefile / Manual (Windows / Linux):**
+    ```bash
+    python run.py test
+    ```
 
-Ou usando o comando nativo do Python:
-```bash
-python -m unittest discover -s tests
-```
+
+---
+
+## 🛠️ Resumo de Comandos (`run.py` e `Makefile`)
+
+Se você estiver em um ambiente Linux/WSL ou tiver o `make` instalado no Windows, você pode optar por usar os atalhos simplificados do `Makefile`. Ambos executam exatamente as mesmas tarefas.
+
+| Comando `run.py` | Atalho `Makefile` | Descrição |
+| :--- | :--- | :--- |
+| `python run.py setup` | `make setup` | Cria o `.env`, cria o ambiente virtual (venv), instala pacotes e o navegador Chromium. |
+| `python run.py run-local` | `make run-local` | Inicia o banco de dados via Docker e executa o pipeline localmente. |
+| `python run.py test` | `make test` | Executa os testes de unidade. |
+| `python run.py run` | `make run` | Executa o pipeline localmente (requer banco de dados rodando previamente). |
+| `python run.py compose-up` | `make compose-up` | Constrói e inicializa todo o projeto e banco em contêineres via Docker Compose. |
+| `python run.py compose-down`| `make compose-down` | Para e limpa os contêineres criados pelo Docker Compose. |
+| `python run.py db-start` | - | Inicia apenas o contêiner do banco de dados PostgreSQL. |
+| `python run.py db-stop` | - | Para o contêiner do banco de dados. |
+| - | `make clean` | Executa o `compose-down` e limpa pastas de cache e ambiente virtual local. |
+
+
+---
+
+### ⚠️ Execução Manual Tradicional (Alternativa)
+Se preferir não usar o `run.py` e executar manualmente:
+
+*   **Linux/macOS (Setup e Execução Local):**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    playwright install chromium
+    docker compose up -d db
+    python main.py
+    ```
+*   **Windows (Setup e Execução Local):**
+    ```bash
+    python -m venv venv
+    venv\Scripts\activate
+    pip install -r requirements.txt
+    playwright install chromium
+    docker compose up -d db
+    python main.py
+    ```
+*   **Rodar os testes nativamente:**
+    ```bash
+    python -m unittest discover -s tests
+    ```
+

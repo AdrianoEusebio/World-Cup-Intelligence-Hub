@@ -1,23 +1,30 @@
-.PHONY: setup run test compose-up compose-down compose-build clean
+.PHONY: setup run test compose-up compose-down run-local clean
 
+# Configura o ambiente (.env, venv/.venv, dependências e Playwright)
 setup:
-	pip install -r requirements.txt
-	playwright install chromium
+	python3 run.py setup
 
+# Executa o pipeline localmente (requer banco rodando previamente)
 run:
-	python main.py
+	python3 run.py run
 
+# Executa a suíte de testes unitários
 test:
-	python -m unittest discover -s tests
+	python3 run.py test
 
+# Inicializa toda a aplicação e banco no Docker Compose
 compose-up:
-	docker-compose up -d
+	python3 run.py compose-up
 
+# Para e remove os contêineres do Docker Compose
 compose-down:
-	docker-compose down
+	python3 run.py compose-down
 
-compose-build:
-	docker-compose build
+# Inicializa o banco no Docker e executa o pipeline local
+run-local:
+	python3 run.py run-local
 
+# Para o docker e limpa arquivos de cache e virtualenvs locais
 clean:
-	rm -rf __pycache__ .pytest_cache
+	python3 run.py compose-down
+	rm -rf __pycache__ .pytest_cache venv .venv
