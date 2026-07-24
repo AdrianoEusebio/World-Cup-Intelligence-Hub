@@ -34,6 +34,35 @@ def is_venv_valid():
     return VENV_DIR.exists() and PYTHON_EXE.exists() and PIP_EXE.exists()
 
 
+def create_venv():
+    """Cria o ambiente virtual, tentando usar o uv se disponível, ou o venv padrão com auto-instalação no Ubuntu/Debian."""
+    if USE_UV:
+        if run_command(["uv", "venv"]):
+            return True
+        print("Failed to create virtual environment with uv. Retrying with standard venv...", file=sys.stderr)
+
+    # Tenta usar o venv padrão
+    if run_command([sys.executable, "-m", "venv", str(VENV_DIR)]):
+        return True
+
+    # Se falhou, verifica se é Linux e tenta instalar python3-venv ou a versão específica pythonX.Y-venv
+    if os.name != "nt":
+        py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+        package_name = f"python{py_version}-venv"
+        print(f"\n[DICA] No Ubuntu/Debian, você precisa instalar o pacote '{package_name}'.", file=sys.stderr)
+        try:
+            response = input(f"Deseja tentar instalar o {package_name} automaticamente via sudo? [S/n]: ").strip().lower()
+            if response in ('', 's', 'sim', 'y', 'yes'):
+                print(f"Executando: sudo apt-get update && sudo apt-get install -y {package_name}")
+                if run_command(["sudo", "apt-get", "update"]) and run_command(["sudo", "apt-get", "install", "-y", package_name]):
+                    print("\nInstalado com sucesso! Tentando recriar o ambiente virtual...")
+                    return run_command([sys.executable, "-m", "venv", str(VENV_DIR)])
+        except Exception as e:
+            print(f"Não foi possível instalar automaticamente: {e}", file=sys.stderr)
+            
+    return False
+
+
 def run_command(args, env=None):
     """Executa um comando no shell mostrando a saída em tempo real."""
     print(f"Executing: {' '.join(str(arg) for arg in args)}")
@@ -107,18 +136,8 @@ def cmd_setup():
                 print(f"Warning: Could not remove directory {VENV_DIR}: {e}", file=sys.stderr)
         
         print(f"Creating virtual environment in {VENV_DIR}...")
-        if USE_UV:
-            if not run_command(["uv", "venv"]):
-                print("Failed to create virtual environment with uv. Retrying with standard venv...", file=sys.stderr)
-                if not run_command([sys.executable, "-m", "venv", str(VENV_DIR)]):
-                    return False
-        else:
-            if not run_command([sys.executable, "-m", "venv", str(VENV_DIR)]):
-                print("Failed to create virtual environment.", file=sys.stderr)
-                if os.name != "nt":
-                    print("\nTip: On Ubuntu/Debian, you may need to install the 'python3-venv' package:", file=sys.stderr)
-                    print("  sudo apt-get update && sudo apt-get install python3-venv\n", file=sys.stderr)
-                return False
+        if not create_venv():
+            return False
     else:
         print("Virtual environment already exists and is valid.")
 
