@@ -27,6 +27,13 @@ else:
     PLAYWRIGHT_CMD = [str(PLAYWRIGHT_EXE)]
 
 
+def is_venv_valid():
+    """Verifica se o ambiente virtual existe e possui os executáveis esperados."""
+    if USE_UV:
+        return VENV_DIR.exists()
+    return VENV_DIR.exists() and PYTHON_EXE.exists() and PIP_EXE.exists()
+
+
 def run_command(args, env=None):
     """Executa um comando no shell mostrando a saída em tempo real."""
     print(f"Executing: {' '.join(str(arg) for arg in args)}")
@@ -90,8 +97,15 @@ def cmd_setup():
     if USE_UV:
         print("Detected 'uv' tool! Using 'uv' for faster setup.")
 
-    # 2. Criar Venv se não existir
-    if not VENV_DIR.exists():
+    # 2. Criar Venv se não existir ou se estiver incompleto/quebrado
+    if not is_venv_valid():
+        if VENV_DIR.exists():
+            print(f"Virtual environment at {VENV_DIR} is incomplete or broken. Recreating...")
+            try:
+                shutil.rmtree(VENV_DIR)
+            except Exception as e:
+                print(f"Warning: Could not remove directory {VENV_DIR}: {e}", file=sys.stderr)
+        
         print(f"Creating virtual environment in {VENV_DIR}...")
         if USE_UV:
             if not run_command(["uv", "venv"]):
@@ -101,9 +115,12 @@ def cmd_setup():
         else:
             if not run_command([sys.executable, "-m", "venv", str(VENV_DIR)]):
                 print("Failed to create virtual environment.", file=sys.stderr)
+                if os.name != "nt":
+                    print("\nTip: On Ubuntu/Debian, you may need to install the 'python3-venv' package:", file=sys.stderr)
+                    print("  sudo apt-get update && sudo apt-get install python3-venv\n", file=sys.stderr)
                 return False
     else:
-        print("Virtual environment already exists.")
+        print("Virtual environment already exists and is valid.")
 
     # 3. Instalar dependências
     print("Installing requirements.txt...")
@@ -131,16 +148,16 @@ def cmd_setup():
 
 def cmd_run():
     """Executa o pipeline principal."""
-    if not USE_UV and not PYTHON_EXE.exists():
-        print("Error: Virtual environment not found. Please run 'python run.py setup' first.", file=sys.stderr)
+    if not is_venv_valid():
+        print("Error: Virtual environment not found or incomplete. Please run 'python run.py setup' first.", file=sys.stderr)
         return False
     return run_command(PYTHON_CMD + ["main.py"])
 
 
 def cmd_test():
     """Executa a suíte de testes unitários."""
-    if not USE_UV and not PYTHON_EXE.exists():
-        print("Error: Virtual environment not found. Please run 'python run.py setup' first.", file=sys.stderr)
+    if not is_venv_valid():
+        print("Error: Virtual environment not found or incomplete. Please run 'python run.py setup' first.", file=sys.stderr)
         return False
     return run_command(PYTHON_CMD + ["-m", "unittest", "discover", "-s", "tests"])
 
@@ -173,9 +190,12 @@ def cmd_run_local():
     """Inicia o banco de dados via Docker e executa o pipeline localmente."""
     print("=== Executando o Pipeline Localmente ===")
     
-    # 1. Certificar que .env existe
-    if not (BASE_DIR / ".env").exists():
-        cmd_setup()
+    # 1. Certificar que o setup foi executado e o ambiente virtual é válido
+    if not (BASE_DIR / ".env").exists() or not is_venv_valid():
+        print("Setup is missing or incomplete. Running setup first...")
+        if not cmd_setup():
+            print("Error: Setup failed. Aborting local execution.", file=sys.stderr)
+            return False
 
     # 2. Iniciar o Banco de Dados
     print("Starting database container...")

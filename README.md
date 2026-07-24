@@ -61,13 +61,17 @@ O projeto possui um script centralizador `run.py` escrito em Python, garantindo 
 
 Abra o terminal (ou Prompt de Comando/PowerShell no Windows) na pasta raiz do projeto:
 
-*   **Com Makefile (Linux / WSL / Windows com Make):**
+*   **Com Makefile:**
     ```bash
     make setup
     ```
-*   **Sem Makefile / Manual (Windows / Linux):**
+*   **Sem Makefile (Windows):**
     ```bash
     python run.py setup
+    ```
+*   **Sem Makefile (Linux):**
+    ```bash
+    python3 run.py setup
     ```
 
 **O que este comando faz automaticamente:**
@@ -92,9 +96,13 @@ Esse modo sobe automaticamente o container do PostgreSQL em background e roda o 
     ```bash
     make run-local
     ```
-*   **Sem Makefile / Manual (Windows / Linux):**
+*   **Sem Makefile (Windows):**
     ```bash
     python run.py run-local
+    ```
+*   **Sem Makefile (Linux):**
+    ```bash
+    python3 run.py run-local
     ```
 
 #### Opção B: Execução Completa via Docker Compose
@@ -109,7 +117,7 @@ Para rodar toda a aplicação e o banco isolados dentro de contêineres Docker:
       ```bash
       make compose-down
       ```
-*   **Sem Makefile / Manual (Windows / Linux):**
+*   **Sem Makefile (Windows):**
     - Para iniciar:
       ```bash
       python run.py compose-up
@@ -129,9 +137,13 @@ Para rodar a suíte completa de testes de forma multiplataforma:
     ```bash
     make test
     ```
-*   **Sem Makefile / Manual (Windows / Linux):**
+*   **Sem Makefile (Windows):**
     ```bash
     python run.py test
+    ```
+*   **Sem Makefile (Linux):**
+    ```bash
+    python3 run.py test
     ```
 
 
