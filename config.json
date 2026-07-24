@@ -1,5 +1,5 @@
 {
-  "URL_RANKING_FIFA": "https://inside.fifa.com/en/fifa-rankings?intcmp=%28p_fifacom%29_%28d_insidefifa%29_%28c_webheader-main%29_%28sc_rankings%29_%28ssc_%29_%28sssc_%29_%28l_en%29_%28da_27112023%29",
+  "URL_RANKING_FIFA": "https://en.wikipedia.org/wiki/FIFA_World_Rankings",
   "ARQUIVO_PARTIDAS_MOCK": "data/partidas_simuladas.json",
   "URL_API_PARTIDAS": "https://api.football-data.org/v4/competitions/WC/matches",
   "CAMINHO_EXPORT_CSV": "data/ranking_fifa_top10.csv",
